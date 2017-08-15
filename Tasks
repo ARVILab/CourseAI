@@ -1,0 +1,14 @@
+1. Редагування фото (ретуш фото)
+	 Є датасет з обробленими фото з фотостудії. Фото до обробки - фото після обробки.
+	 Задача: навчити нейромережу оброблювати фото так само якісно, як і людина.
+
+2. Розпізнавання мікровиразів на обличчі людини по відео.
+   Всі мікровирази обличчя: https://imotions.com/blog/facial-action-coding-system/
+   Facial action coding system (FACs) - система, яка є стандартом
+
+   Datasets: 1. Cohn-Kanade (CK and CK+) database	
+   			     2. CASME database
+
+   Аналог такого алгоритму в продукті : https://www.affectiva.com
+   Демка для браузера (ноут+вебка) - https://jsfiddle.net/affectiva/opyh5e8d/show
+   Ідеально було б - щоб досягти рівня рекогнішена як на відео: https://www.youtube.com/watch?v=cvjHHD_qgEU
