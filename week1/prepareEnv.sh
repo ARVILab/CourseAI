@@ -9,3 +9,4 @@ pip install --upgrade tensorflow-gpu
 pip install keras
 pip install pandas
 pip install scipy
+pip install tsne
