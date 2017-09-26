@@ -15,4 +15,4 @@ pip2 install keras
 pip2 install pandas
 pip2 install scipy
 pip2 install tsne
-pip2 install jupyter
+pip2 install --upgrade jupyter
