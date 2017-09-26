@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+
 class MultiboxLoss(object):
     """Multibox loss with some helper functions.
 

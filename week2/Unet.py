@@ -1,10 +1,9 @@
-
 from keras.models import Model
 from keras.layers import Input, merge, core, Dropout
 from keras.layers.convolutional import Convolution2D, MaxPooling2D, UpSampling2D
 
 
-def Unet(nClasses , optimizer=None , input_width=360 , input_height=480 , nChannels=3 ):
+def Unet(nClasses, optimizer=None, input_width=360, input_height=480, nChannels=3):
 
     inputs = Input((input_height, input_width, nChannels))
     conv1 = Convolution2D(32, 3, 3, activation='relu', border_mode='same')(inputs)
@@ -31,24 +30,21 @@ def Unet(nClasses , optimizer=None , input_width=360 , input_height=480 , nChann
     conv5 = Dropout(0.2)(conv5)
     conv5 = Convolution2D(32, 3, 3, activation='relu', border_mode='same')(conv5)
 
-    conv6 = Convolution2D(nClasses, 1, 1, activation='relu' ,border_mode='same')(conv5)
-    conv6 = core.Reshape((nClasses , input_height*input_width))(conv6)
-    conv6 = core.Permute((2 ,1))(conv6)
-
+    conv6 = Convolution2D(nClasses, 1, 1, activation='relu', border_mode='same')(conv5)
+    conv6 = core.Reshape((nClasses, input_height*input_width))(conv6)
+    conv6 = core.Permute((2, 1))(conv6)
 
     conv7 = core.Activation('softmax')(conv6)
 
     model = Model(input=inputs, output=conv7)
 
-    if not optimizer is None:
-        model.compile(loss="categorical_crossentropy", optimizer= optimizer , metrics=['accuracy'] )
+    if optimizer is not None:
+        model.compile(loss="categorical_crossentropy", optimizer=optimizer, metrics=['accuracy'])
 
     return model
+
 
 if __name__ == '__main__':
     m = Unet(81, optimizer='adam')
     from keras.utils import plot_model
     plot_model(m, show_shapes=True, to_file='modelGraphs/Unet.png')
-
-
-

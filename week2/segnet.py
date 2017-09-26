@@ -65,16 +65,17 @@ def segnet(nClasses, optimizer=None, input_height=256, input_width=256):
     model.outputHeight = model.output_shape[-3]
     model.outputWidth = model.output_shape[-2]
 
-    model.add(Reshape((nClasses, model.outputHeight  * model.outputWidth),
-                      input_shape=(nClasses, model.outputHeight , model.outputWidth)))
+    model.add(Reshape((nClasses, model.outputHeight * model.outputWidth),
+                      input_shape=(nClasses, model.outputHeight, model.outputWidth)))
 
     model.add(Permute((2, 1)))
     model.add(Activation('softmax'))
 
-    if not optimizer is None:
+    if optimizer is not None:
         model.compile(loss="categorical_crossentropy", optimizer=optimizer, metrics=['accuracy'])
 
     return model
+
 
 if __name__ == '__main__':
     m = segnet(81, optimizer='adam')

@@ -1,6 +1,7 @@
 import numpy as np
 import tensorflow as tf
 
+
 class BBoxUtility(object):
     """Utility class to do some stuff with bounding boxes and priors.
 

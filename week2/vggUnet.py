@@ -4,6 +4,7 @@ from keras.utils.data_utils import get_file
 
 WEIGHTS_PATH_NO_TOP = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.1/vgg19_weights_tf_dim_ordering_tf_kernels_notop.h5'
 
+
 def VGGUnet(n_classes, input_height=416, input_width=608, vgg_level=3):
     img_input = Input(shape=(input_height, input_width, 3))
 
@@ -39,7 +40,9 @@ def VGGUnet(n_classes, input_height=416, input_width=608, vgg_level=3):
     x = MaxPooling2D((2, 2), strides=(2, 2), name='block5_pool')(x)
     f5 = x
     vgg = Model(img_input, x)
-    weights_path = get_file('vgg19_weights_tf_dim_ordering_tf_kernels_notop.h5',WEIGHTS_PATH_NO_TOP,cache_subdir='models')
+    weights_path = get_file('vgg19_weights_tf_dim_ordering_tf_kernels_notop.h5',
+                            WEIGHTS_PATH_NO_TOP,
+                            cache_subdir='models')
     vgg.load_weights(weights_path, by_name=True)
 
     levels = [f1, f2, f3, f4, f5]
