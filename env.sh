@@ -4,6 +4,7 @@ apt-get update
 apt-get -y install python-pip
 apt-get -y install ipython ipython-notebook
 apt-get -y install cython
+apt-get -y install python-numpy python-scipy python-matplotlib
 
 pip2 install --upgrade pip
 pip2 install cython
