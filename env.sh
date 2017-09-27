@@ -5,6 +5,10 @@ apt-get -y install python-pip
 apt-get -y install ipython ipython-notebook
 apt-get -y install cython
 apt-get -y install python-numpy python-scipy python-matplotlib
+apt-get -y install build-essential autoconf libtool pkg-config python-opengl
+apt-get -y install python-imaging
+apt-get -y install python-dev
+apt-get -y install libopenblas-dev libblas-dev libatlas-base-dev
 
 pip2 install --upgrade pip
 pip2 install cython
