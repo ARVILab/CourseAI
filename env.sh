@@ -20,6 +20,7 @@ pip2 install --upgrade jupyter
 pip2 install h5py
 pip2 install pillow
 pip2 install pylab
+pip2 install tnse
 
 python2 -m pip install ipykernel
 python2 -m ipykernel install --user
