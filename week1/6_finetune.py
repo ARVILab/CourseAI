@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from keras.applications.resnet50 import ResNet50, preprocess_input
+from keras.applications.resnet50 import ResNet50
 from keras.models import Model
 from keras.layers import Dense, Flatten
 from keras.optimizers import SGD
@@ -9,13 +9,13 @@ from keras.preprocessing.image import ImageDataGenerator
 
 
 # модель = ResNet50 без голови з одним dense шаром для класифікації об'єктів на nb_classes
-def get_model(nb_classes=100):
+def get_model(cls=100):
     feature_extractor = ResNet50(include_top=False, weights='imagenet', input_shape=(224, 224, 3))
     flat = Flatten()(feature_extractor.output)
     # можна додати кілька dense шарів:
     # d = Dense(nb_classes*2, activation='relu')(flat)
     # d = Dense(nb_classes, activation='softmax')(d)
-    d = Dense(nb_classes, activation='softmax')(flat)
+    d = Dense(cls, activation='softmax')(flat)
     m = Model(inputs=feature_extractor.input, outputs=d)
 
     # "заморозимо" всі шари ResNet50, крім кількох останніх
