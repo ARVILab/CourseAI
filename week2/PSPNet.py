@@ -178,7 +178,7 @@ def build_psp(res, input_shape):
 
 
 def PSPNet(classnum=81, input_shape=(473, 473)):
-    inp = Input((input_shape[0], input_shape[1], 3))
+    inp = Input(input_shape + (3,))
     res = ResNet(inp, layers=50)
     psp = build_psp(res, input_shape)
 
