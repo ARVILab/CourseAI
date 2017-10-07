@@ -44,6 +44,8 @@ def VGGUnet(n_classes, input_height=256, input_width=256, vgg_level=3):
                             WEIGHTS_PATH_NO_TOP,
                             cache_subdir='models')
     vgg.load_weights(weights_path, by_name=True)
+    for layer in vgg.layers:
+        layer.trainable = False
 
     levels = [f1, f2, f3, f4, f5]
 
@@ -71,19 +73,12 @@ def VGGUnet(n_classes, input_height=256, input_width=256, vgg_level=3):
     d = BatchNormalization()(d)
     d = Activation('relu')(d)
 
-    d = Conv2D(n_classes, (3, 3), padding='same')(d)
-    o_shape = Model(img_input, d).output_shape
-    outputHeight = o_shape[1]
-    outputWidth = o_shape[2]
+    d = Conv2D(n_classes, (1, 1))(d)
+    d = Activation('softmax')(d)
 
-    d = (Reshape((-1, outputHeight * outputWidth)))(d)
-    d = (Permute((2, 1)))(d)
-    d = (Activation('softmax'))(d)
-    model = Model(img_input, d)
-    model.outputWidth = outputWidth
-    model.outputHeight = outputHeight
+    finalmodel = Model(inputs=img_input, outputs=d)
 
-    return model
+    return finalmodel
 
 
 if __name__ == '__main__':

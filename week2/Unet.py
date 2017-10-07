@@ -30,10 +30,7 @@ def Unet(nClasses, optimizer=None, input_width=360, input_height=480, nChannels=
     conv5 = Dropout(0.2)(conv5)
     conv5 = Convolution2D(32, 3, 3, activation='relu', border_mode='same')(conv5)
 
-    conv6 = Convolution2D(nClasses, 1, 1, activation='relu', border_mode='same')(conv5)
-    conv6 = core.Reshape((nClasses, input_height*input_width))(conv6)
-    conv6 = core.Permute((2, 1))(conv6)
-
+    conv6 = Convolution2D(nClasses, 1, 1)(conv5)
     conv7 = core.Activation('softmax')(conv6)
 
     model = Model(input=inputs, output=conv7)
