@@ -1,7 +1,7 @@
 from keras.models import *
 from keras.layers import *
 from keras.utils.data_utils import get_file
-from keras.optimizers import SGD
+# from keras.optimizers import SGD
 WEIGHTS_PATH_NO_TOP = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.1/vgg19_weights_tf_dim_ordering_tf_kernels_notop.h5'
 
 
@@ -10,6 +10,7 @@ def Interp(x, shape):
     new_height, new_width = shape
     resized = ktf.image.resize_images(x, [new_height, new_width], align_corners=True)
     return resized
+
 
 def VGGUnet(n_classes, input_height=256, input_width=256, vgg_level=4):
     img_input = Input(shape=(input_height, input_width, 3))
@@ -100,8 +101,14 @@ def VGGUnet(n_classes, input_height=256, input_width=256, vgg_level=4):
 
     model = Model(img_input, [seg_0, seg_1, seg_2, seg_3, seg_4])
 
-    sgd = SGD(lr=0.001, momentum=0.9)
-    model.compile('adam', loss=['categorical_crossentropy', 'categorical_crossentropy', 'categorical_crossentropy', 'categorical_crossentropy', 'categorical_crossentropy', 'categorical_crossentropy'])
+    # sgd = SGD(lr=0.001, momentum=0.9)
+    model.compile('adam',
+                  loss=['categorical_crossentropy',
+                        'categorical_crossentropy',
+                        'categorical_crossentropy',
+                        'categorical_crossentropy',
+                        'categorical_crossentropy',
+                        'categorical_crossentropy'])
 
     return model
 
