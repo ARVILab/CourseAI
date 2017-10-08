@@ -1,10 +1,14 @@
 from __future__ import print_function
 
+from keras.models import Model
+from keras.layers import Input, merge, Convolution2D, MaxPooling2D, UpSampling2D
+from keras.optimizers import Adam
+from keras.callbacks import ModelCheckpoint
+
+import random
 import cv2
 import numpy as np
-from keras.models import Model
-from keras.layers import Input, merge, Convolution2D, MaxPooling2D, UpSampling2D, Dropout
-from keras.optimizers import Adam
+import glob
 
 from skimage.transform import rotate
 
@@ -12,7 +16,6 @@ img_rows = 160
 img_cols = 224
 
 smooth = 1.
-
 
 
 def augmentation(image, imageB, org_width=160, org_height=224, width=190, height=262):
@@ -28,8 +31,8 @@ def augmentation(image, imageB, org_width=160, org_height=224, width=190, height
 
     xstart = np.random.randint(width - org_width)
     ystart = np.random.randint(height - org_height)
-    image = image[ ystart:ystart + org_height, xstart:xstart + org_width,]
-    imageB = imageB[ ystart:ystart + org_height, xstart:xstart + org_width,]
+    image = image[ystart:ystart + org_height, xstart:xstart + org_width]
+    imageB = imageB[ystart:ystart + org_height, xstart:xstart + org_width]
 
     if np.random.randint(2):
         image = cv2.flip(image, 1)
@@ -107,18 +110,12 @@ def get_unet():
     return model
 
 
-import random
-from keras.callbacks import ModelCheckpoint
-import cv2
-import numpy as np
-import glob
-
 imgWidth = 473
 
 
 labelPath = 'data/masks/'
 imgsPath = 'data/imgs/'
-imgList = [f for f in glob.glob(imgsPath+'*')]
+imgList = [f for f in glob.glob(imgsPath + '*')]
 
 random.shuffle(imgList)
 trainCount = int(len(imgList) * 0.95)
@@ -129,7 +126,7 @@ def generator(imgNames, batch_size=8):
 
     def prepareImage(imgId):
         filename = imgNames[imgId]
-        lblPath = filename.replace('.jpg','.npy').replace(imgsPath, labelPath)
+        lblPath = filename.replace('.jpg', '.npy').replace(imgsPath, labelPath)
 
         lbl = np.load(lblPath).astype(np.float)
         img = cv2.imread(filename)
@@ -145,12 +142,11 @@ def generator(imgNames, batch_size=8):
     while 1:
         k = k % imgCount
         rgb1Batch = np.zeros((batch_size, img_cols, img_rows, 3))
-        labelWVBatch = np.zeros((batch_size, img_cols,img_rows, 1), dtype=np.float32)
+        labelWVBatch = np.zeros((batch_size, img_cols, img_rows, 1), dtype=np.float32)
 
         for b in range(0, batch_size):
-            if not k % imgCount:
+            if not k:
                 random.shuffle(imgNames)
-                k = 0
             rgb1Batch[b, :, :, :], labelWVBatch[b, :, :, 0] = prepareImage(k)
             k += 1
         yield rgb1Batch, labelWVBatch
@@ -163,23 +159,23 @@ testgen = generator(imgList[trainCount:], batch_size=8)
 model = get_unet()
 model.load_weights('./weights/unet.hdf5')
 
-k=0
+k = 0
 for imgpath in imgList:
     img, img1 = augmentation(cv2.imread(imgpath), cv2.imread(imgpath))
     lbl = model.predict(np.expand_dims(img, axis=0))[0]
     b_channel, g_channel, r_channel = cv2.split((img*255).astype(np.uint8))
 
-    alpha_channel = (lbl[:,:,0] * 255).astype(np.uint8)  # creating a dummy alpha channel image.
+    alpha_channel = (lbl[:, :, 0] * 255).astype(np.uint8)  # creating a dummy alpha channel image.
     img_RGBA = cv2.merge((b_channel, g_channel, r_channel, alpha_channel))
 
     cv2.imwrite('res/' + str(k) + '.png', img_RGBA)
-    k+=1
+    k += 1
 
 model.summary()
 model.fit_generator(
     generator=traingen, validation_data=testgen,
-    steps_per_epoch = 500,
-    validation_steps= 50,
+    steps_per_epoch=500,
+    validation_steps=50,
     epochs=30000,
     verbose=1,
     callbacks=[
