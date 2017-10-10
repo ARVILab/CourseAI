@@ -53,8 +53,8 @@ def generator(batch_size=4):
                 '''
                 bbox[0] *= 300. / img_data['width']  # x
                 bbox[1] *= 300. / img_data['height']  # y
-                bbox[3] *= 300. / img_data['width']  # width
-                bbox[4] *= 300. / img_data['height']  # height
+                bbox[2] *= 300. / img_data['width']  # width
+                bbox[3] *= 300. / img_data['height']  # height
                 classes = np.zeros(80)
                 classes[catsToIds[ann['category_id']]] = 1
                 bboxList.append(np.concatenate((bbox,classes)))
