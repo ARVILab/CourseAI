@@ -40,8 +40,22 @@ def generator(batch_size=4):
             bboxList = []
             for ann in anns:
                 bbox = np.array(ann['bbox'], dtype=np.float)
-                bbox[0::2] /= imgData['height']
-                bbox[1::2] /= imgData['width']
+                '''
+                annotation{
+                    "id" : int, 
+                    "image_id" : int, 
+                    "category_id" : int, 
+                    "segmentation" : RLE or [polygon], 
+                    "area" : float, 
+                    "bbox" : [x,y,width,height], 
+                    "iscrowd" : 0 or 1,
+                }
+                '''
+                bbox[0] *= 300. / img_data['width']  # xmin
+                bbox[1] *= 300. / img_data['height']  # ymin
+                bbox[2] = bbox[0] + bbox[2] * (300. / img_data['width'])  # xmax
+                bbox[3] = bbox[1] + bbox[3] * (300. / img_data['height'])  # ymax
+                # assign box format ([xmin,ymin,xmax,ymax] + [one_hot(80)])
                 classes = np.zeros(80)
                 classes[catsToIds[ann['category_id']]] = 1
                 bboxList.append(np.concatenate((bbox,classes)))
