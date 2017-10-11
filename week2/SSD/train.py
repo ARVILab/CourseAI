@@ -50,11 +50,12 @@ def generator(batch_size=4):
                     "bbox" : [x,y,width,height], 
                     "iscrowd" : 0 or 1,
                 }
+                assign_boxes use relative values.
                 '''
-                bbox[0] *= 300. / img_data['width']  # xmin
-                bbox[1] *= 300. / img_data['height']  # ymin
-                bbox[2] = bbox[0] + bbox[2] * (300. / img_data['width'])  # xmax
-                bbox[3] = bbox[1] + bbox[3] * (300. / img_data['height'])  # ymax
+                bbox[0] *= 1. / img_data['width'] # x
+                bbox[1] *= 1. / img_data['height']  # y
+                bbox[2] = bbox[0] + bbox[2] * (1. / img_data['width'])  # width
+                bbox[3] = bbox[1] + bbox[3] * (1. / img_data['height'])  # height
                 # assign box format ([xmin,ymin,xmax,ymax] + [one_hot(80)])
                 classes = np.zeros(80)
                 classes[catsToIds[ann['category_id']]] = 1
