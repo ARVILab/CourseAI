@@ -3,7 +3,8 @@ from ssd_utils import BBoxUtility
 from ssd_training import MultiboxLoss
 from pycocotools.coco import COCO
 import numpy as np
-import cv2
+from scipy.misc import imread
+from scipy.misc import imresize
 import pickle
 
 model = SSD300(num_classes=81)
@@ -33,9 +34,9 @@ def generator(batch_size=4):
         for i in range(0, batch_size):
             n = n%imgcount
             img_data = cocodata.imgs[imgList[n]]
-            imgPath = cocoDir + img_data['file_name']
-            img = cv2.imread(imgPath)
-            X[i] = cv2.resize(img, (300, 300), interpolation=cv2.INTER_CUBIC).astype(np.float) / 127.5 - 1.
+            img_path = cocoDir + img_data['file_name']
+            img = imread(img_path, mode="RGB").astype('float32')
+            X[i] = imresize(img, (300, 300)).astype('float32') / 127.5 - 1.
             anns = cocodata.imgToAnns[imgList[n]]
             bboxList = []
             for ann in anns:
@@ -50,11 +51,12 @@ def generator(batch_size=4):
                     "bbox" : [x,y,width,height], 
                     "iscrowd" : 0 or 1,
                 }
+                assign_boxes use relative values.
                 '''
-                bbox[0] *= 300. / img_data['width']  # xmin
-                bbox[1] *= 300. / img_data['height']  # ymin
-                bbox[2] = bbox[0] + bbox[2] * (300. / img_data['width'])  # xmax
-                bbox[3] = bbox[1] + bbox[3] * (300. / img_data['height'])  # ymax
+                bbox[0] *= 1. / img_data['width'] # x
+                bbox[1] *= 1. / img_data['height']  # y
+                bbox[2] = bbox[0] + bbox[2] * (1. / img_data['width'])  # width
+                bbox[3] = bbox[1] + bbox[3] * (1. / img_data['height'])  # height
                 # assign box format ([xmin,ymin,xmax,ymax] + [one_hot(80)])
                 classes = np.zeros(80)
                 classes[catsToIds[ann['category_id']]] = 1
