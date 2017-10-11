@@ -3,7 +3,8 @@ from ssd_utils import BBoxUtility
 from ssd_training import MultiboxLoss
 from pycocotools.coco import COCO
 import numpy as np
-import cv2
+from scipy.misc import imread
+from scipy.misc import imresize
 import pickle
 
 model = SSD300(num_classes=81)
@@ -34,8 +35,8 @@ def generator(batch_size=4):
             n = n%imgcount
             imgData = cocodata.imgs[imgList[n]]
             imgPath = cocoDir + imgData['file_name']
-            img = cv2.imread(imgPath)
-            X[i] = cv2.resize(img, (300,300), interpolation=cv2.INTER_CUBIC).astype(np.float) / 127.5 - 1.
+            img = imread(img_path, mode="RGB").astype('float32')
+            X[i] = imresize(img, (300, 300)).astype('float32') / 127.5 - 1.
             anns = cocodata.imgToAnns[imgList[n]]
             bboxList = []
             for ann in anns:
