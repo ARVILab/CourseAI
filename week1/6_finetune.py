@@ -4,7 +4,7 @@ import os
 import re
 import numpy as np
 import random
-from keras.applications.resnet50 import ResNet50
+from keras.applications.resnet50 import ResNet50, preprocess_input
 from keras.models import Model
 from keras.layers import Dense, Flatten, Dropout
 # from keras.optimizers import SGD
@@ -107,7 +107,8 @@ def gen(files):
                 random.shuffle(files)
 
         # x = datagen.flow(x, batch_size=batch_size).next()
-        x = x.astype(np.float) / 127.5 - 1
+        # x = x.astype(np.float) / 127.5 - 1
+        x = preprocess_input(x)
 
         yield x, y
 
