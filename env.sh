@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+export LC_ALL=C
+
 apt-get update
 apt-get -y install python-pip
 apt-get -y install ipython ipython-notebook
