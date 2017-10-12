@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+export LC_ALL=C
+
 apt-get update
 apt-get -y install python-pip
 apt-get -y install ipython ipython-notebook
@@ -20,7 +22,8 @@ pip2 install --upgrade tensorflow-gpu
 pip2 install keras
 pip2 install pandas
 pip2 install scipy
-pip2 install h5py, pillow, pylab, tsne, annoy
+pip2 install h5py
+pip2 install pillow, pylab, tsne, annoy
 
 python2 -m pip install ipykernel
 python2 -m ipykernel install --user
