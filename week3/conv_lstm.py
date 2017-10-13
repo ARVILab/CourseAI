@@ -37,6 +37,9 @@ print('x_test shape:', x_test.shape)
 
 print('Build model...')
 
+
+
+
 model = Sequential()
 model.add(Embedding(max_features, embedding_size, input_length=maxlen))
 model.add(Dropout(0.25))
