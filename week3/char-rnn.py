@@ -2,14 +2,15 @@ from __future__ import print_function
 from keras.models import Sequential
 from keras.layers import Dense, Activation
 from keras.layers import LSTM
+from keras.callbacks import ModelCheckpoint
 from keras.optimizers import RMSprop
-from keras.utils.data_utils import get_file
+# from keras.utils.data_utils import get_file
 import numpy as np
 import random
 import sys
+import os
 
-path = get_file('nietzsche.txt', origin='https://s3.amazonaws.com/text-datasets/nietzsche.txt')
-text = open(path).read().lower()
+text = open('ukrlit/texts/zahrebelnyi-roksolana.txt').read()
 print('corpus length:', len(text))
 
 chars = sorted(list(set(text)))
@@ -43,8 +44,11 @@ model.add(LSTM(128, input_shape=(maxlen, len(chars))))
 model.add(Dense(len(chars)))
 model.add(Activation('softmax'))
 
-optimizer = RMSprop(lr=0.01)
+optimizer = 'adam'  # RMSprop(lr=0.01)
 model.compile(loss='categorical_crossentropy', optimizer=optimizer)
+
+if os.path.isfile('charnn.h5'):
+    model.load_weights('charnn.h5')
 
 
 def sample(preds, temperature=1.0):
@@ -56,14 +60,16 @@ def sample(preds, temperature=1.0):
     probas = np.random.multinomial(1, preds, 1)
     return np.argmax(probas)
 
+
 # train the model, output generated text after each iteration
+model.fit(X, y, batch_size=4096, epochs=20)
+
 for iteration in range(1, 60):
     print()
     print('-' * 50)
     print('Iteration', iteration)
-    model.fit(X, y,
-              batch_size=128,
-              epochs=1)
+    model.fit(X, y, batch_size=1024, epochs=1,
+              callbacks=[ModelCheckpoint('charnn.h5', save_best_only=True, monitor='val_loss')])
 
     start_index = random.randint(0, len(text) - maxlen - 1)
 
