@@ -65,14 +65,14 @@ def sample(preds, temperature=1.0):
 
 # train the model, output generated text after each iteration
 model.fit(X, y, batch_size=8192, epochs=20,
-          callbacks=[ModelCheckpoint('charnn.h5', save_best_only=True, monitor='val_loss')])
+          callbacks=[ModelCheckpoint('charnn.h5')])
 
 for iteration in range(1, 60):
     print()
     print('-' * 50)
     print('Iteration', iteration)
     model.fit(X, y, batch_size=1024, epochs=1,
-              callbacks=[ModelCheckpoint('charnn.h5', save_best_only=True, monitor='val_loss')])
+              callbacks=[ModelCheckpoint('charnn.h5')])
 
     start_index = random.randint(0, len(text) - maxlen - 1)
 
