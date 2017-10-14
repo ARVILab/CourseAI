@@ -3,16 +3,18 @@
 from __future__ import print_function
 from keras.models import Sequential
 from keras.layers import Dense, Activation
+from keras.layers import TimeDistributed
 from keras.layers import LSTM
 from keras.callbacks import ModelCheckpoint
-from keras.optimizers import RMSprop
+# from keras.optimizers import RMSprop
 # from keras.utils.data_utils import get_file
 import numpy as np
 import random
 import sys
 import os
+import codecs
 
-text = open('ukrlit/texts/shevchenko-haidamaky.txt').read()
+text = codecs.open('ukrlit/texts/shevchenko-haidamaky.txt', "r", "utf-8").read()
 print('corpus length:', len(text))
 
 chars = sorted(list(set(text)))
@@ -21,7 +23,7 @@ char_indices = dict((c, i) for i, c in enumerate(chars))
 indices_char = dict((i, c) for i, c in enumerate(chars))
 
 # cut the text in semi-redundant sequences of maxlen characters
-maxlen = 40
+maxlen = 60
 step = 3
 sentences = []
 next_chars = []
@@ -38,13 +40,15 @@ for i, sentence in enumerate(sentences):
         X[i, t, char_indices[char]] = 1
     y[i, char_indices[next_chars[i]]] = 1
 
+# перепишіть X та y
 
 # build the model: a single LSTM
 print('Build model...')
 model = Sequential()
-model.add(LSTM(128, input_shape=(maxlen, len(chars))))
-model.add(Dense(len(chars)))
+model.add(LSTM(128, return_sequences=True, input_shape=(maxlen, len(chars))))  # 60x128
+model.add(TimeDistributed(Dense(len(chars))))
 model.add(Activation('softmax'))
+model.summary()
 
 optimizer = 'adam'  # RMSprop(lr=0.01)
 model.compile(loss='categorical_crossentropy', optimizer=optimizer)
@@ -64,7 +68,7 @@ def sample(preds, temperature=1.0):
 
 
 # train the model, output generated text after each iteration
-model.fit(X, y, batch_size=8192, epochs=20,
+model.fit(X, y, batch_size=2048, epochs=50,
           callbacks=[ModelCheckpoint('charnn.h5')])
 
 for iteration in range(1, 60):
@@ -86,7 +90,7 @@ for iteration in range(1, 60):
         print('----- Generating with seed: "' + sentence + '"')
         sys.stdout.write(generated)
 
-        for i in range(400):
+        for i in range(200):
             x = np.zeros((1, maxlen, len(chars)))
             for t, char in enumerate(sentence):
                 x[0, t, char_indices[char]] = 1.
