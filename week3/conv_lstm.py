@@ -4,7 +4,7 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation
 from keras.layers import Embedding
 from keras.layers import LSTM
-from keras.layers import Conv1D, MaxPooling1D
+from keras.layers import Conv1D, MaxPooling1D, Bidirectional
 from keras.datasets import imdb
 
 # Embedding
@@ -18,14 +18,15 @@ filters = 64
 pool_size = 4
 
 # LSTM
-lstm_output_size = 70
+lstm_output_size = 128
 
 # Training
-batch_size = 30
-epochs = 2
+batch_size = 32
+epochs = 5
 
 print('Loading data...')
 (x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=max_features)
+print(x_train.shape)
 print(len(x_train), 'train sequences')
 print(len(x_test), 'test sequences')
 
@@ -38,8 +39,6 @@ print('x_test shape:', x_test.shape)
 print('Build model...')
 
 
-
-
 model = Sequential()
 model.add(Embedding(max_features, embedding_size, input_length=maxlen))
 model.add(Dropout(0.25))
@@ -49,7 +48,10 @@ model.add(Conv1D(filters,
                  activation='relu',
                  strides=1))
 model.add(MaxPooling1D(pool_size=pool_size))
-model.add(LSTM(lstm_output_size))
+model.add(Bidirectional(LSTM(lstm_output_size, return_sequences=True)))
+# 256 x len
+model.add(Bidirectional(LSTM(lstm_output_size)))
+model.add(Dropout(0.5))
 model.add(Dense(1))
 model.add(Activation('sigmoid'))
 
