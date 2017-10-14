@@ -59,6 +59,11 @@ for d in dirs:
 
 random.shuffle(dataset)
 
+# x - 4-вимірний тензор (кількість зображень у батчі, 224, 224, 3)
+# y - 2-вимірний тензор (кількість зображень у батчі, кількість класів)
+# y[i] = (0, ..., 0, 1, 0, ..., 0) "one hot encoding"
+
+
 # ділимо датасет на train та validation
 split = int(0.1 * len(dataset))
 train_dataset = dataset[split:]
