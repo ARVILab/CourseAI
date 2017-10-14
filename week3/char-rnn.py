@@ -2,7 +2,7 @@
 
 from __future__ import print_function
 from keras.models import Sequential
-from keras.layers import Dense, Activation
+from keras.layers import Dense, Activation, TimeDistributed
 from keras.layers import LSTM
 from keras.callbacks import ModelCheckpoint
 from keras.optimizers import RMSprop
@@ -12,7 +12,8 @@ import random
 import sys
 import os
 
-text = open('ukrlit/texts/zahrebelnyi-roksolana.txt').read()
+import codecs
+text = codecs.open('ukrlit/texts/zahrebelnyi-roksolana.txt', "r", "utf-8").read()
 print('corpus length:', len(text))
 
 chars = sorted(list(set(text)))
@@ -27,24 +28,23 @@ sentences = []
 next_chars = []
 for i in range(0, len(text) - maxlen, step):
     sentences.append(text[i: i + maxlen])
-    next_chars.append(text[i + maxlen])
+    next_chars.append(text[i+1: i + maxlen+1])
 print('nb sequences:', len(sentences))
 
 print('Vectorization...')
 X = np.zeros((len(sentences), maxlen, len(chars)), dtype=np.bool)
-y = np.zeros((len(sentences), len(chars)), dtype=np.bool)
+y = np.zeros((len(sentences), maxlen, len(chars)), dtype=np.bool)
 for i, sentence in enumerate(sentences):
     for t, char in enumerate(sentence):
         X[i, t, char_indices[char]] = 1
-    y[i, char_indices[next_chars[i]]] = 1
+        y[i, t, char_indices[next_chars[i][t]]] = 1
 
 
 # build the model: a single LSTM
 print('Build model...')
 model = Sequential()
-model.add(LSTM(128, input_shape=(maxlen, len(chars))))
-model.add(Dense(len(chars)))
-model.add(Activation('softmax'))
+model.add(LSTM(128, return_sequences=True, input_shape=(maxlen, len(chars))))
+model.add(TimeDistributed(Dense(len(chars), activation='softmax')))
 
 optimizer = 'adam'  # RMSprop(lr=0.01)
 model.compile(loss='categorical_crossentropy', optimizer=optimizer)
@@ -91,7 +91,7 @@ for iteration in range(1, 60):
             for t, char in enumerate(sentence):
                 x[0, t, char_indices[char]] = 1.
 
-            preds = model.predict(x, verbose=0)[0]
+            preds = model.predict(x, verbose=0)[0][-1]
             next_index = sample(preds, diversity)
             next_char = indices_char[next_index]
 
