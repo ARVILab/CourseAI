@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from __future__ import print_function
 from keras.models import Sequential
 from keras.layers import Dense, Activation
@@ -62,7 +64,8 @@ def sample(preds, temperature=1.0):
 
 
 # train the model, output generated text after each iteration
-model.fit(X, y, batch_size=4096, epochs=20)
+model.fit(X, y, batch_size=8192, epochs=20,
+          callbacks=[ModelCheckpoint('charnn.h5', save_best_only=True, monitor='val_loss')])
 
 for iteration in range(1, 60):
     print()
