@@ -53,8 +53,8 @@ class DataManager(object):
         self.image_feature_files = None
         self.elapsed_time = None
 
-        if self.extract_image_features == True:
-            assert self.image_directory != None
+        if self.extract_image_features:
+            assert self.image_directory is not None
 
     def preprocess(self):
         start_time = time.time()
@@ -63,7 +63,7 @@ class DataManager(object):
         self.get_corpus_statistics()
         self.remove_infrequent_words()
         self.construct_dictionaries()
-        if self.extract_image_features == True:
+        if self.extract_image_features:
             self.get_image_features(self.image_directory)
             self.move_to_path()
             self.write_image_features_to_h5()
@@ -72,7 +72,7 @@ class DataManager(object):
         self.write_dictionaries()
         self.elapsed_time = time.time() - start_time
         self.write_parameters()
-        if self.split_data_flag == True:
+        if self.split_data_flag:
             self.split_data()
         self.move_path_back()
 
@@ -81,7 +81,7 @@ class DataManager(object):
         print('Loading data ...')
         data = np.load(data_filename)
         data = np.asarray(data)
-        if self.randomize_data == True:
+        if self.randomize_data:
             np.random.shuffle(data)
         self.image_files = data[:, 0]
         self.captions = data[:, 1]
@@ -95,7 +95,7 @@ class DataManager(object):
         previous_file_size = len(self.captions)
         for image_arg, caption in enumerate(self.captions):
             lemmatized_caption = self.lemmatize_sentence(caption)
-            if (len(lemmatized_caption) <= self.max_caption_length):
+            if len(lemmatized_caption) <= self.max_caption_length:
                 reduced_captions.append(lemmatized_caption)
                 reduced_image_files.append(self.image_files[image_arg])
 
@@ -112,11 +112,11 @@ class DataManager(object):
 
     def lemmatize_sentence(self, caption):
         incorrect_chars = digits + ";.,'/*?><:{}[\]|+"
-        #char_translator = str.maketrans('', '', incorrect_chars)
-        #quotes_translator = str.maketrans('', '', '"')
+        # char_translator = str.maketrans('', '', incorrect_chars)
+        # quotes_translator = str.maketrans('', '', '"')
         clean_caption = caption.strip().lower()
-        #clean_caption = clean_caption.translate(char_translator)
-        #clean_caption = clean_caption.translate(quotes_translator)
+        # clean_caption = clean_caption.translate(char_translator)
+        # clean_caption = clean_caption.translate(quotes_translator)
         clean_caption = clean_caption.split(' ')
         return clean_caption
 
@@ -135,7 +135,7 @@ class DataManager(object):
         previous_vocabulary_size = len(self.word_frequencies)
         if self.word_frequency_treshold != 0:
             self.word_frequencies = np.asarray(
-                self.word_frequencies[0:frequent_threshold_arg])
+                self.word_frequencies[0: frequent_threshold_arg])
         else:
             self.word_frequencies = np.asarray(self.word_frequencies)
 
@@ -364,4 +364,3 @@ if __name__ == '__main__':
                                dump_path='preprocessed_data/')
 
     data_manager.preprocess()
-
