@@ -8,7 +8,7 @@ def imageCapModel(vocab_size=42):
     for layer in fExtractor.layers:
         layer.trainable = False
 
-    features2048 = fExtractor(inp)
+    features2048 = Flatten()(fExtractor(inp))
     features512 = Dense(512, activation='relu')(features2048)
     repeat12 = RepeatVector(n=12)(features512)
     lstm1 = LSTM(128, return_sequences=True)(repeat12)
@@ -20,4 +20,3 @@ def imageCapModel(vocab_size=42):
     model.compile('adam', 'categorical_crossentropy')
 
     return model
-
