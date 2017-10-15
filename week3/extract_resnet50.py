@@ -22,8 +22,11 @@ model.compile('adam', 'mse')
 
 # from - to dirs
 
-in_path = '../datasets/coco/train2017/'
-out_path = 'data/resnet50_vectors/'
+in_path = '../datasets/coco/val2017/'
+out_path = 'data/resnet50_vectors_val/'
+
+if not os.path.isdir(out_path):
+    os.makedirs(out_path)
 
 # filter images
 
