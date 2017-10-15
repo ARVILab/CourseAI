@@ -91,6 +91,20 @@ path2 class_no_2
 
 ## Задачі на тиждень 16.10 - 20.10
 
+Використовуючи датасет `facs` 
+([Facial Action Coding System](https://en.wikipedia.org/wiki/Facial_Action_Coding_System)),
+натренувати мережу, яка за послідовністю зображень обличчя людини `images`
+прогнозує емоції `emotions` та набір мікровиразів обличчя `labels` (action units, AU).
+
+Підказка: для отримання ключових точок обличчя використовуйте бібліотеку `dlib`,
+для отримання ознак - натреновану на обличчях нейромережу 
+[`vggFace`](https://github.com/rcmalli/keras-vggface).
+
+```bash
+sudo pip install dlib
+sudo pip install keras_vggface
+```
+
 ## 21.10
 
 ## 22.10
