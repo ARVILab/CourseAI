@@ -5,15 +5,15 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation, TimeDistributed
 from keras.layers import LSTM
 from keras.callbacks import ModelCheckpoint
-from keras.optimizers import RMSprop
+# from keras.optimizers import RMSprop
 # from keras.utils.data_utils import get_file
 import numpy as np
 import random
 import sys
 import os
-
 import codecs
-text = codecs.open('ukrlit/texts/zahrebelnyi-roksolana.txt', "r", "utf-8").read()
+
+text = codecs.open('ukrlit/texts/shevchenko-haidamaky.txt', "r", "utf-8").read()
 print('corpus length:', len(text))
 
 chars = sorted(list(set(text)))
@@ -22,13 +22,13 @@ char_indices = dict((c, i) for i, c in enumerate(chars))
 indices_char = dict((i, c) for i, c in enumerate(chars))
 
 # cut the text in semi-redundant sequences of maxlen characters
-maxlen = 40
+maxlen = 60
 step = 3
 sentences = []
 next_chars = []
 for i in range(0, len(text) - maxlen, step):
     sentences.append(text[i: i + maxlen])
-    next_chars.append(text[i+1: i + maxlen+1])
+    next_chars.append(text[i+1: i + maxlen + 1])
 print('nb sequences:', len(sentences))
 
 print('Vectorization...')
@@ -64,7 +64,7 @@ def sample(preds, temperature=1.0):
 
 
 # train the model, output generated text after each iteration
-model.fit(X, y, batch_size=8192, epochs=20,
+model.fit(X, y, batch_size=8192, epochs=50,
           callbacks=[ModelCheckpoint('charnn.h5')])
 
 for iteration in range(1, 60):
