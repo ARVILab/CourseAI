@@ -14,7 +14,7 @@ def imageCapModel(vocab_size=42):
     lstm1 = LSTM(128, return_sequences=True)(repeat12)
     lstm2 = LSTM(128, return_sequences=True)(lstm1)
 
-    output = TimeDistributed(Dense(vocab_size, activation='sigmoid'))(lstm2)
+    output = TimeDistributed(Dense(vocab_size, activation='softmax'))(lstm2)
 
     model = Model(inputs=inp, outputs=output)
     model.compile('adam', 'categorical_crossentropy')
