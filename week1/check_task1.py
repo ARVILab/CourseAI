@@ -1,5 +1,5 @@
 true_labels = []
-with open('classifieds_labels.txt') as f:
+with open('../datasets/classifieds/labels.txt') as f:
     for s in f:
         s = s.strip().split(' ', 1)[1].split('_')[0]
         true_labels.append(int(s))
@@ -7,7 +7,7 @@ with open('classifieds_labels.txt') as f:
 n = len(true_labels)
 test_labels = [-1] * n
 
-with open('test_udod.txt') as f:
+with open('test_my.txt') as f:
     for s in f:
         path, class_no = s.strip().split(' ')
         i = int(path.split('/')[-1].split('.')[0])
