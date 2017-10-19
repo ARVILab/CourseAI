@@ -59,7 +59,7 @@ def generator(seqIds, batch_size=2):
                 framesBatch[b,:,:,:,:] = seqImg
                 landmarksBatch[b, :, :, :] = seqLand[:, :, :]
 
-            labelsBatch[b, :] = Y[seqId][0]
+            labelsBatch[b, :] = Y[seqId]
             k += 1
             k = min(imgCount - 1, k)
         framesBatch[:, :, :, :, 0] -= 93.5940
