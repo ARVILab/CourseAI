@@ -28,8 +28,8 @@ def f(ifn):
     out_img = imread(ofn)
     out_img = imresize(out_img, im_size)
 
-    diff = np.array(in_img, dtype=np.int16)
-    diff = diff - out_img
+    diff = np.array(out_img, dtype=np.int16)
+    diff = diff - in_img
 
     imsave(x_dir + ifn, in_img)
     np.save(y_dir + ifn, diff)
