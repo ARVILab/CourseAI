@@ -1,12 +1,11 @@
 from vggFace import VGGFace
 from keras.models import Model, Sequential
-from keras.layers import TimeDistributed, Conv2D, Flatten, LSTM, Dense, Input, Concatenate, Lambda, BatchNormalization
-import keras.backend as K
+from keras.layers import TimeDistributed, Conv2D, Flatten, LSTM, Dense, Input, Concatenate, BatchNormalization
 
 
 def getModel(frameCount=42, nb_classes=7):
 
-    vggFaceEncoder = VGGFace(include_top=False, input_shape=(224,224,3))
+    vggFaceEncoder = VGGFace(include_top=False, input_shape=(224, 224, 3))
     for layer in vggFaceEncoder.layers:
         layer.trainable = False
 
