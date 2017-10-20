@@ -1,6 +1,6 @@
 from vggFace import VGGFace
 from keras.models import Model, Sequential
-from keras.layers import TimeDistributed, Conv2D, Flatten, LSTM, Dense, Input, Concatenate, Lambda
+from keras.layers import TimeDistributed, Conv2D, Flatten, LSTM, Dense, Input, Concatenate, Lambda, BatchNormalization
 import keras.backend as K
 
 
@@ -13,9 +13,10 @@ def getModel(frameCount=42, nb_classes=7):
     frameEncoder = Sequential()
     frameEncoder.add(vggFaceEncoder)
     frameEncoder.add(Conv2D(256, kernel_size=(3, 3), activation='relu', padding='valid'))
+    frameEncoder.add(BatchNormalization())
     frameEncoder.add(Flatten())
     frameEncoder.add(Dense(512, activation='relu'))
-    frameEncoder.add(Lambda(lambda x: x*1))
+    frameEncoder.add(BatchNormalization())
 
     frameInput = Input((frameCount, 224, 224, 3))
     frameFeatures = TimeDistributed(frameEncoder)(frameInput)
@@ -25,16 +26,17 @@ def getModel(frameCount=42, nb_classes=7):
     landmarkEncoder = Sequential()
     landmarkEncoder.add(Flatten(input_shape=(68, 2)))
     landmarkEncoder.add(Dense(256, activation='relu'))
+    landmarkEncoder.add(BatchNormalization())
     landmarkEncoder.add(Dense(128, activation='relu'))
-    landmarkEncoder.add(Lambda(lambda x: x*1))
+    landmarkEncoder.add(BatchNormalization())
 
     landmarkFeatures = TimeDistributed(landmarkEncoder)(landmarkInput)
 
     allFeatures = Concatenate(axis=-1)([frameFeatures, landmarkFeatures])
-    lstmFeatures = LSTM(128)(allFeatures)
+    lstmFeatures = LSTM(256)(allFeatures)
 
     out = Dense(nb_classes, activation='sigmoid')(lstmFeatures)
 
-    model = Model(inputs=[frameInput, landmarkInput], outputs=out)
+    model = Model(inputs=[frameInput,landmarkInput], outputs=out)
     model.compile('adam', 'binary_crossentropy', metrics=['accuracy'])
     return model
