@@ -21,7 +21,7 @@ def f(fn):
     return img / 127.5 - 1, dif / 255.
 
 
-def datagen(batch_size=8):
+def datagen(batch_size=16):
     pool = ThreadPool(cpu_count())
     datapath = '../../datasets/retouch/'
     imgnames = [s for s in os.listdir(datapath + '/input_1024/') if s.endswith('.jpg')]
