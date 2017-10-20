@@ -99,7 +99,7 @@ def pix2pix_generator(it, dout_size):
     """
     for a, b in it:
         # 1 is fake, 0 is real
-        y = np.zeros((a.shape[0],)+dout_size +(1,))
+        y = np.zeros((a.shape[0],)+dout_size + (1,))
         yield [a, b], y
 
 
