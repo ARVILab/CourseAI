@@ -21,7 +21,7 @@ def f(fn):
     return img / 127.5 - 1, dif / 255.
 
 
-def datagen(batch_size=4):
+def datagen(batch_size=8):
     pool = ThreadPool(cpu_count())
     datapath = '../../datasets/retouch/'
     imgnames = [s for s in os.listdir(datapath + '/input_1024/') if s.endswith('.jpg')]
@@ -252,8 +252,8 @@ if __name__ == '__main__':
         'nfatob': 16,  # Number of filters of the first layer of the AtoB model
         'alpha': 100,  # The weight of the reconstruction loss of the atob model
         # Train
-        'epochs': 100,  # Number of epochs to train the model
-        'batch_size': 1,  # The batch size
+        'epochs': 1000,  # Number of epochs to train the model
+        'batch_size': 16,  # The batch size
         'samples_per_batch': 5,  # The number of samples to train each model on each iteration
         'save_every': 10,  # Save results every 'save_every' epochs on the log folder
         'lr': 2e-4,  # The learning rate to train the models
@@ -262,7 +262,7 @@ if __name__ == '__main__':
         # File system
         'log_dir': 'log',  # Directory to log
         'expt_name': None,  # The name of the experiment. Saves the logs into a folder with this name
-        'base_dir': '/DATA/CourseAI/datasets/retouch/',  # Directory that contains the data
+        'base_dir': '../../datasets/retouch/',  # Directory that contains the data
         'train_dir': 'train',  # Directory inside base_dir that contains training data
         'val_dir': 'val',  # Directory inside base_dir that contains validation data
         'train_samples': -1,  # The number of training samples. Set -1 to be the same as training examples
