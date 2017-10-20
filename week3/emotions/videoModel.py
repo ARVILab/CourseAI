@@ -36,6 +36,6 @@ def getModel(frameCount=42, nb_classes=7):
 
     out = Dense(nb_classes, activation='sigmoid')(lstmFeatures)
 
-    model = Model(inputs=[frameInput,landmarkInput], outputs=out)
+    model = Model(inputs=[frameInput, landmarkInput], outputs=out)
     model.compile('adam', 'binary_crossentropy', metrics=['accuracy'])
     return model
