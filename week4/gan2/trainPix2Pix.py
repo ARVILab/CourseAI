@@ -10,8 +10,8 @@ from utils import MyDict, log, save_weights, load_weights, load_losses, create_e
 from scipy.misc import imread
 from multiprocessing import cpu_count
 from multiprocessing.pool import ThreadPool
-import matplotlib
-matplotlib.use('Agg')
+
+# add to ~/.config/matplotlib/matplotlibrc line backend : Agg
 
 
 def f(fn):
