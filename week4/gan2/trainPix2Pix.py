@@ -8,24 +8,49 @@ from tqdm import tqdm
 from keras.optimizers import Adam
 from utils import MyDict, log, save_weights, load_weights, load_losses, create_expt_dir
 from scipy.misc import imread
+from multiprocessing import cpu_count
+from multiprocessing.pool import ThreadPool
+import matplotlib
+matplotlib.use('Agg')
 
 
-def datagen(datapath, batch_size=4):
+def f(fn):
+    datapath = '../../datasets/retouch/'
+    img = imread(datapath + 'input_1024/' + fn).astype(np.float)
+    dif = np.load(datapath + 'output-input_1024/' + fn + '.npy').astype(np.float)
+    return img / 127.5 - 1, dif / 255.
+
+
+def datagen(batch_size=4):
+    pool = ThreadPool(cpu_count())
+    datapath = '../../datasets/retouch/'
     imgnames = [s for s in os.listdir(datapath + '/input_1024/') if s.endswith('.jpg')]
     n = len(imgnames)
     k = 0
     while True:
-        X = np.zeros((batch_size, 1024, 1024, 3))
+        x = np.zeros((batch_size, 1024, 1024, 3))
         y = np.zeros((batch_size, 1024, 1024, 3))
-        for i in range(0, batch_size):
-            img = imread(datapath + 'input_1024/' + imgnames[k]).astype(np.float)
-            dif = np.load(datapath + 'output-input_1024/' + imgnames[k]+'.npy').astype(np.float)
-            X[i] = img / 127.5 - 1
-            y[i] = dif / 255.
+
+        batch = []
+        for i in range(batch_size):
+            batch.append(imgnames[k])
             k = (k + 1) % n
             if not k:
                 random.shuffle(imgnames)
-        yield X, y
+
+        result = pool.map(f, batch)
+
+        for i, r in enumerate(result):
+            x[i] = r[0]
+            y[i] = r[1]
+            # img = imread(datapath + 'input_1024/' + imgnames[k]).astype(np.float)
+            # dif = np.load(datapath + 'output-input_1024/' + imgnames[k]+'.npy').astype(np.float)
+            # X[i] = img / 127.5 - 1
+            # y[i] = dif / 255.
+            # k = (k + 1) % n
+            # if not k:
+            #     random.shuffle(imgnames)
+        yield x, y
 
 
 def discriminator_generator(it, atob, dout_size):
@@ -297,9 +322,9 @@ if __name__ == '__main__':
 
     ts = params.target_size
     train_dir = os.path.join(params.base_dir, params.train_dir)
-    it_train = datagen('../../datasets/retouch/')
+    it_train = datagen()
     val_dir = os.path.join(params.base_dir, params.val_dir)
-    it_val = datagen('../../datasets/retouch/')
+    it_val = datagen()
 
     models = model_creation(d, unet, params)
     train(models, it_train, it_val, params)
