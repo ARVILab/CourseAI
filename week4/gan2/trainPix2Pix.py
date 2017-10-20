@@ -26,6 +26,7 @@ def datagen(datapath, batch_size=4):
             dif /= 255.
             X[i] = img
             y[i] = dif
+            k+=1
         yield X, y
 
 
