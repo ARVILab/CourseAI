@@ -17,8 +17,8 @@ from multiprocessing.pool import ThreadPool
 def f(fn):
     datapath = '../../datasets/retouch/'
     img = imread(datapath + 'input_1024/' + fn).astype(np.float)
-    dif = np.load(datapath + 'output-input_1024/' + fn + '.npy').astype(np.float)
-    return img / 127.5 - 1, dif / 255.
+    out = imread(datapath + 'output_1024/' + fn).astype(np.float)
+    return img / 127.5 - 1, out / 127.5 - 1
 
 
 def datagen(batch_size=16):
