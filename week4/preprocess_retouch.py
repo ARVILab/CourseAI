@@ -8,6 +8,7 @@ in_dir = '../datasets/retouch/input/'
 out_dir = '../datasets/retouch/output/'
 x_dir = '../datasets/retouch/input_1024/'
 y_dir = '../datasets/retouch/output-input_1024/'
+z_dir = '../datasets/retouch/output_1024/'
 
 im_size = (1024, 1024)
 
@@ -32,6 +33,7 @@ def f(ifn):
     diff = diff - in_img
 
     imsave(x_dir + ifn, in_img)
+    imsave(z_dir + ifn, out_img)
     np.save(y_dir + ifn, diff)
 
 
