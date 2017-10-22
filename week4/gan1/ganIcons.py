@@ -101,15 +101,17 @@ def generator_model():
     return Model(inputs=[_inp, _inp_label], outputs=x)
 
 
-discriminator = discriminator_model()
 def custom_D_loss_mse(y_true, y_pred):
     shape = tf.shape(y_pred)
     half_size = tf.cast(shape[0]/2, tf.int32)
-    realImages_true = y_true[:half_size,:]
-    realImages_pred = y_pred[:half_size,:]
+    realImages_true = y_true[:half_size, :]
+    realImages_pred = y_pred[:half_size, :]
 
     mse = K.mean(K.square(realImages_true - realImages_pred))
     return mse
+
+
+discriminator = discriminator_model()
 discriminator.compile(
     loss=['binary_crossentropy', custom_D_loss_mse],
     optimizer=RMSprop(lr=0.0002, decay=6e-8))
