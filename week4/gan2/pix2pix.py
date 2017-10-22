@@ -26,11 +26,10 @@ def Convolution(f, k=3, s=2, border_mode='same', **kwargs):
                          **kwargs)
 
 
-def Deconvolution(f, output_shape, k=2, s=2, **kwargs):
+def Deconvolution(f, k=2, s=2, **kwargs):
     """Convenience method for Transposed Convolutions."""
     return Conv2DTranspose(f,
                            kernel_size=(k, k),
-                           # output_shape=output_shape,
                            strides=(s, s),
                            data_format=K.image_data_format(),
                            **kwargs)
@@ -61,7 +60,7 @@ def g_unet(in_ch, out_ch, nf, batch_size=1, is_binary=False, name='unet'):
         'concat_axis': 3
     }
 
-    i = Input(shape=(1024, 1024, in_ch))
+    i = Input(shape=(256, 256, in_ch))
     print('TensorflowShapedU-NET')
 
     def get_deconv_shape(samples, channels, x_dim, y_dim):
@@ -69,117 +68,100 @@ def g_unet(in_ch, out_ch, nf, batch_size=1, is_binary=False, name='unet'):
 
     merge_params['concat_axis'] = 3
 
-    # in_ch x 512 x 512
+    # in_ch x 256 x 256
     conv1 = Convolution(nf)(i)
     conv1 = BatchNorm()(conv1)
     x = LeakyReLU(0.2)(conv1)
-    # nf x 256 x 256
+    # nf x 128 x 128
 
     conv2 = Convolution(nf * 2)(x)
     conv2 = BatchNorm()(conv2)
     x = LeakyReLU(0.2)(conv2)
-    # nf*2 x 128 x 128
+    # nf*2 x 64 x 64
 
     conv3 = Convolution(nf * 4)(x)
     conv3 = BatchNorm()(conv3)
     x = LeakyReLU(0.2)(conv3)
-    # nf*4 x 64 x 64
+    # nf*4 x 32 x 32
 
     conv4 = Convolution(nf * 8)(x)
     conv4 = BatchNorm()(conv4)
     x = LeakyReLU(0.2)(conv4)
-    # nf*8 x 32 x 32
+    # nf*8 x 16 x 16
 
     conv5 = Convolution(nf * 8)(x)
     conv5 = BatchNorm()(conv5)
     x = LeakyReLU(0.2)(conv5)
-    # nf*8 x 16 x 16
+    # nf*8 x 8 x 8
 
     conv6 = Convolution(nf * 8)(x)
     conv6 = BatchNorm()(conv6)
     x = LeakyReLU(0.2)(conv6)
-    # nf*8 x 8 x 8
+    # nf*8 x 4 x 4
 
     conv7 = Convolution(nf * 8)(x)
     conv7 = BatchNorm()(conv7)
     x = LeakyReLU(0.2)(conv7)
-    # nf*8 x 4 x 4
-
-    conv8 = Convolution(nf * 8)(x)
-    conv8 = BatchNorm()(conv8)
-    x = LeakyReLU(0.2)(conv8)
     # nf*8 x 2 x 2
 
-    conv9 = Convolution(nf * 8, k=2, s=1, border_mode='valid')(x)
-    conv9 = BatchNorm()(conv9)
-    x = LeakyReLU(0.2)(conv9)
+    conv8 = Convolution(nf * 8, k=2, s=1, border_mode='valid')(x)
+    conv8 = BatchNorm()(conv8)
+    x = LeakyReLU(0.2)(conv8)
     # nf*8 x 1 x 1
 
-    dconv1 = Deconvolution(nf * 8,
-                           get_deconv_shape(batch_size, 4, 4, nf * 8),
-                           k=2, s=1)(x)
+    dconv1 = Deconvolution(nf * 8, k=2, s=1)(x)
     dconv1 = BatchNorm()(dconv1)
     dconv1 = Dropout(0.5)(dconv1)
-
-    x = concatenate_layers([dconv1, conv8], **merge_params)
+    x = concatenate_layers([dconv1, conv7], **merge_params)
 
     x = LeakyReLU(0.2)(x)
     # nf*(8 + 8) x 2 x 2
 
-    dconv2 = Deconvolution(nf * 8,
-                           get_deconv_shape(batch_size,  8, 8, nf * 8))(x)
+    dconv2 = Deconvolution(nf * 8)(x)
     dconv2 = BatchNorm()(dconv2)
     dconv2 = Dropout(0.5)(dconv2)
-    x = concatenate_layers([dconv2, conv7], **merge_params)
+    x = concatenate_layers([dconv2, conv6], **merge_params)
     x = LeakyReLU(0.2)(x)
     # nf*(8 + 8) x 4 x 4
 
-    dconv3 = Deconvolution(nf * 8,
-                           get_deconv_shape(batch_size, 16, 16, nf * 8))(x)
+    dconv3 = Deconvolution(nf * 8)(x)
     dconv3 = BatchNorm()(dconv3)
     dconv3 = Dropout(0.5)(dconv3)
-    x = concatenate_layers([dconv3, conv6], **merge_params)
+    x = concatenate_layers([dconv3, conv5], **merge_params)
     x = LeakyReLU(0.2)(x)
     # nf*(8 + 8) x 8 x 8
 
-    dconv4 = Deconvolution(nf * 8,
-                           get_deconv_shape(batch_size, 32, 32, nf * 8))(x)
+    dconv4 = Deconvolution(nf * 8)(x)
     dconv4 = BatchNorm()(dconv4)
-    x = concatenate_layers([dconv4, conv5], **merge_params)
+    x = concatenate_layers([dconv4, conv4], **merge_params)
     x = LeakyReLU(0.2)(x)
     # nf*(8 + 8) x 16 x 16
 
-    dconv5 = Deconvolution(nf * 8,
-                           get_deconv_shape(batch_size, 64, 64, nf * 8))(x)
+    dconv5 = Deconvolution(nf * 8)(x)
     dconv5 = BatchNorm()(dconv5)
-    x = concatenate_layers([dconv5, conv4], **merge_params)
+    x = concatenate_layers([dconv5, conv3], **merge_params)
     x = LeakyReLU(0.2)(x)
     # nf*(8 + 8) x 32 x 32
 
-    dconv6 = Deconvolution(nf * 4,
-                           get_deconv_shape(batch_size, 128, 128, nf * 4))(x)
+    dconv6 = Deconvolution(nf * 4)(x)
     dconv6 = BatchNorm()(dconv6)
-    x = concatenate_layers([dconv6, conv3], **merge_params)
+    x = concatenate_layers([dconv6, conv2], **merge_params)
     x = LeakyReLU(0.2)(x)
     # nf*(4 + 4) x 64 x 64
 
-    dconv7 = Deconvolution(nf * 2,
-                           get_deconv_shape(batch_size, 256, 256, nf * 2))(x)
+    dconv7 = Deconvolution(nf * 2)(x)
     dconv7 = BatchNorm()(dconv7)
-    x = concatenate_layers([dconv7, conv2], **merge_params)
+    x = concatenate_layers([dconv7, conv1], **merge_params)
     x = LeakyReLU(0.2)(x)
     # nf*(2 + 2) x 128 x 128
 
-    dconv8 = Deconvolution(nf,
-                           get_deconv_shape(batch_size, 512, 512, nf))(x)
+    dconv8 = Deconvolution(nf)(x)
     dconv8 = BatchNorm()(dconv8)
-    x = concatenate_layers([dconv8, conv1], **merge_params)
-    x = LeakyReLU(0.2)(x)
+    x = LeakyReLU(0.2)(dconv8)
     # nf*(1 + 1) x 256 x 256
 
-    dconv9 = Deconvolution(out_ch,
-                           get_deconv_shape(batch_size, out_ch, 1024, 1024))(x)
-    # out_ch x 512 x 512
+    dconv9 = Deconvolution(out_ch, k=1, s=1)(x)
+    # out_ch x 256 x 256
 
     act = 'sigmoid' if is_binary else 'tanh'
     out = Activation(act)(dconv9)
@@ -301,7 +283,7 @@ def pix2pix(atob, d, a_ch, b_ch, alpha=100, is_a_binary=False,
 
 
 if __name__ == '__main__':
-    unet = g_unet(3, 3, 16, batch_size=8, is_binary=False)
+    unet = g_unet(3, 3, 32, batch_size=8, is_binary=False)
     disc = discriminator(3, 3, 16)
     pp_net = pix2pix(unet, disc, 3, 3)
     print('ololo')
