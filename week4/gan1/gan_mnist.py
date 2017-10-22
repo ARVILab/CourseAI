@@ -59,6 +59,7 @@ def generator_model():
     x = Activation('relu')(x)
 
     x = Conv2DTranspose(1, 5, padding='same')(x)
+    # no batch norm here
     x = Activation('sigmoid')(x)
 
     return Model(inputs=_inp, outputs=x)

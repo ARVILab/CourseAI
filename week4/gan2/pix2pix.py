@@ -1,9 +1,9 @@
 import keras
 from keras import backend as K
 from keras import objectives
-from keras.layers import Input, merge
+from keras.layers import Input
 from keras.layers.advanced_activations import LeakyReLU
-from keras.layers.convolutional import Convolution2D, Deconvolution2D
+from keras.layers.convolutional import Convolution2D
 from keras.layers.core import Activation, Dropout
 from keras.layers.normalization import BatchNormalization
 from keras.models import Model
@@ -13,7 +13,7 @@ from keras.layers.convolutional import Conv2DTranspose
 from keras.layers.merge import Concatenate
 
 
-def concatenate_layers(inputs, concat_axis, mode='concat'):
+def concatenate_layers(inputs, concat_axis):
     return Concatenate(axis=concat_axis)(inputs)
 
 
@@ -25,16 +25,18 @@ def Convolution(f, k=3, s=2, border_mode='same', **kwargs):
                          strides=(s, s),
                          **kwargs)
 
+
 def Deconvolution(f, output_shape, k=2, s=2, **kwargs):
     """Convenience method for Transposed Convolutions."""
     return Conv2DTranspose(f,
-                               kernel_size=(k, k),
-                               output_shape=output_shape,
-                               strides=(s, s),
-                               data_format=K.image_data_format(),
-                               **kwargs)
+                           kernel_size=(k, k),
+                           # output_shape=output_shape,
+                           strides=(s, s),
+                           data_format=K.image_data_format(),
+                           **kwargs)
 
-def BatchNorm(mode=2, axis=1, **kwargs):
+
+def BatchNorm(axis=1, **kwargs):
     """Convenience method for BatchNormalization layers."""
     return BatchNormalization(axis=axis, **kwargs)
 
@@ -56,7 +58,6 @@ def g_unet(in_ch, out_ch, nf, batch_size=1, is_binary=False, name='unet'):
     ##>>> unet.summary()  #doctest: +NORMALIZE_WHITESPACE
     """
     merge_params = {
-        'mode': 'concat',
         'concat_axis': 3
     }
 
@@ -271,7 +272,7 @@ def pix2pix(atob, d, a_ch, b_ch, alpha=100, is_a_binary=False,
     bp = atob(a)
 
     # Discriminator receives the pair of images
-    d_in = concatenate_layers([a, bp], mode='concat', concat_axis=-1)
+    d_in = concatenate_layers([a, bp], concat_axis=-1)
 
     pix2pix = Model([a, b], d(d_in), name=name)
 
@@ -301,6 +302,6 @@ def pix2pix(atob, d, a_ch, b_ch, alpha=100, is_a_binary=False,
 
 if __name__ == '__main__':
     unet = g_unet(3, 3, 16, batch_size=8, is_binary=False)
-    disc=discriminator(3,3,16)
-    pp_net=pix2pix(unet, disc, 3, 3)
+    disc = discriminator(3, 3, 16)
+    pp_net = pix2pix(unet, disc, 3, 3)
     print('ololo')

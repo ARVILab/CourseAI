@@ -1,33 +1,56 @@
 import os
 import sys
 import getopt
-
 import numpy as np
 import pix2pix as m
-
 import random
 from tqdm import tqdm
 from keras.optimizers import Adam
 from utils import MyDict, log, save_weights, load_weights, load_losses, create_expt_dir
 from scipy.misc import imread
+from multiprocessing import cpu_count
+from multiprocessing.pool import ThreadPool
 
-def datagen(datapath, batch_size=4):
-    imgnames = os.listdir(datapath+'/input_1024/')
-    random.shuffle(imgnames)
-    k=0
+# add to ~/.config/matplotlib/matplotlibrc line backend : Agg
+
+
+def f(fn):
+    datapath = '../../datasets/retouch/'
+    img = imread(datapath + 'input_1024/' + fn).astype(np.float)
+    out = imread(datapath + 'output_1024/' + fn).astype(np.float)
+    return img / 127.5 - 1, out / 127.5 - 1
+
+
+def datagen(batch_size=16):
+    pool = ThreadPool(cpu_count())
+    datapath = '../../datasets/retouch/'
+    imgnames = [s for s in os.listdir(datapath + '/input_1024/') if s.endswith('.jpg')]
+    n = len(imgnames)
+    k = 0
     while True:
-        X = np.zeros((batch_size, 1024, 1024, 3))
+        x = np.zeros((batch_size, 1024, 1024, 3))
         y = np.zeros((batch_size, 1024, 1024, 3))
-        for i in range(0, batch_size):
-            img = imread(datapath+'input_1024/'+imgnames[k]).astype(np.float)
-            dif = np.load(datapath+'output-input_1024/'+imgnames[k]+'.npy').astype(np.float)
-            img /= 127.5
-            img -= 1
-            dif /= 255.
-            X[i] = img
-            y[i] = dif
-            k+=1
-        yield X, y
+
+        batch = []
+        for i in range(batch_size):
+            batch.append(imgnames[k])
+            k = (k + 1) % n
+            if not k:
+                random.shuffle(imgnames)
+
+        result = pool.map(f, batch)
+
+        for i, r in enumerate(result):
+            x[i] = r[0]
+            y[i] = r[1]
+            # img = imread(datapath + 'input_1024/' + imgnames[k]).astype(np.float)
+            # dif = np.load(datapath + 'output-input_1024/' + imgnames[k]+'.npy').astype(np.float)
+            # X[i] = img / 127.5 - 1
+            # y[i] = dif / 255.
+            # k = (k + 1) % n
+            # if not k:
+            #     random.shuffle(imgnames)
+        yield x, y
 
 
 def discriminator_generator(it, atob, dout_size):
@@ -63,7 +86,7 @@ def discriminator_generator(it, atob, dout_size):
 
 def train_discriminator(d, it, samples_per_batch=20):
     """Train the discriminator network."""
-    return d.fit_generator(it, samples_per_epoch=samples_per_batch*2, nb_epoch=1, verbose=False)
+    return d.fit_generator(it, steps_per_epoch=samples_per_batch*2, epochs=1, verbose=False)
 
 
 def pix2pix_generator(it, dout_size):
@@ -76,13 +99,13 @@ def pix2pix_generator(it, dout_size):
     """
     for a, b in it:
         # 1 is fake, 0 is real
-        y = np.zeros((a.shape[0],)+dout_size +(1,))
+        y = np.zeros((a.shape[0],)+dout_size + (1,))
         yield [a, b], y
 
 
 def train_pix2pix(pix2pix, it, samples_per_batch=2):
     """Train the generator network."""
-    return pix2pix.fit_generator(it, nb_epoch=1, samples_per_epoch=samples_per_batch, verbose=False)
+    return pix2pix.fit_generator(it, epochs=1, steps_per_epoch=samples_per_batch, verbose=False)
 
 
 def evaluate(models, generators, losses, val_samples=192):
@@ -219,6 +242,7 @@ def train(models, it_train, it_val, params):
             log(losses, models.atob, it_val, log_dir=params.log_dir, expt_name=params.expt_name,
                 is_a_binary=params.is_a_binary, is_b_binary=params.is_b_binary)
 
+
 if __name__ == '__main__':
     a = sys.argv[1:]
 
@@ -228,8 +252,8 @@ if __name__ == '__main__':
         'nfatob': 16,  # Number of filters of the first layer of the AtoB model
         'alpha': 100,  # The weight of the reconstruction loss of the atob model
         # Train
-        'epochs': 100,  # Number of epochs to train the model
-        'batch_size': 1,  # The batch size
+        'epochs': 1000,  # Number of epochs to train the model
+        'batch_size': 16,  # The batch size
         'samples_per_batch': 5,  # The number of samples to train each model on each iteration
         'save_every': 10,  # Save results every 'save_every' epochs on the log folder
         'lr': 2e-4,  # The learning rate to train the models
@@ -238,7 +262,7 @@ if __name__ == '__main__':
         # File system
         'log_dir': 'log',  # Directory to log
         'expt_name': None,  # The name of the experiment. Saves the logs into a folder with this name
-        'base_dir': '/DATA/CourseAI/datasets/retouch/',  # Directory that contains the data
+        'base_dir': '../../datasets/retouch/',  # Directory that contains the data
         'train_dir': 'train',  # Directory inside base_dir that contains training data
         'val_dir': 'val',  # Directory inside base_dir that contains validation data
         'train_samples': -1,  # The number of training samples. Set -1 to be the same as training examples
@@ -298,9 +322,9 @@ if __name__ == '__main__':
 
     ts = params.target_size
     train_dir = os.path.join(params.base_dir, params.train_dir)
-    it_train = datagen('/DATA/CourseAI/datasets/retouch/')
+    it_train = datagen()
     val_dir = os.path.join(params.base_dir, params.val_dir)
-    it_val = datagen('/DATA/CourseAI/datasets/retouch/')
+    it_val = datagen()
 
     models = model_creation(d, unet, params)
     train(models, it_train, it_val, params)

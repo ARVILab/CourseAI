@@ -107,6 +107,9 @@ sudo pip install keras_vggface
 
 ## 21.10
 
+Модифікувати приклад `week4/gan1/gan_mnist.py`, 
+реалізувати InfoGAN на MNIST датасеті.
+
 ## 22.10
 
 ## Задачі на тиждень 23.10 - 27.10
