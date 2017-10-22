@@ -136,7 +136,7 @@ def log(losses, atob, it_val, N=4, log_dir=DEFAULT_LOG_DIR, expt_name=None,
     ###########################################################################
     #                          PLOT THE A->B RESULTS                          #
     ###########################################################################
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(12, 8))
     for i in range(N*N):
         a, _ = next(it_val)
 
