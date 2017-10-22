@@ -211,7 +211,7 @@ def train(models, it_train, it_val, params):
     create_expt_dir(params)
 
     # Get the output shape of the discriminator
-    dout_size = d.output_shape[-3:-1]
+    dout_size = models.d.output_shape[-3:-1]
     # Define the data generators
     generators = generators_creation(it_train, it_val, models, dout_size)
 
