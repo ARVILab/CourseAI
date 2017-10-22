@@ -182,28 +182,28 @@ def discriminator(a_ch, b_ch, nf, opt=Adam(lr=2e-4, beta_1=0.5), name='d'):
     #>>> for ilay in disc.layers: ilay.name='_'.join(ilay.name.split('_')[:-1]) # remove layer id
     #>>> disc.summary() #doctest: +NORMALIZE_WHITESPACE
     """
-    i = Input(shape=(1024, 1024, a_ch + b_ch))
+    i = Input(shape=(256, 256, a_ch + b_ch))
 
-    # (a_ch + b_ch) x 512 x 512
+    # (a_ch + b_ch) x 256 x 256
     conv1 = Convolution(nf)(i)
     x = LeakyReLU(0.2)(conv1)
-    # nf x 256 x 256
+    # nf x 128 x 128
 
     conv2 = Convolution(nf * 2)(x)
     x = LeakyReLU(0.2)(conv2)
-    # nf*2 x 128 x 128
+    # nf*2 x 64 x 64
 
     conv3 = Convolution(nf * 4)(x)
     x = LeakyReLU(0.2)(conv3)
-    # nf*4 x 64 x 64
+    # nf*4 x 32 x 32
 
     conv4 = Convolution(nf * 8)(x)
     x = LeakyReLU(0.2)(conv4)
-    # nf*8 x 32 x 32
+    # nf*8 x 16 x 16
 
     conv5 = Convolution(1)(x)
     out = Activation('sigmoid')(conv5)
-    # 1 x 16 x 16
+    # 1 x 8 x 8
 
     d = Model(i, out, name=name)
 
