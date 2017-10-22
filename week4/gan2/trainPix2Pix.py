@@ -7,7 +7,7 @@ import random
 from tqdm import tqdm
 from keras.optimizers import Adam
 from utils import MyDict, log, save_weights, load_weights, load_losses, create_expt_dir
-from scipy.misc import imread
+from scipy.misc import imread, imresize
 from multiprocessing import cpu_count
 from multiprocessing.pool import ThreadPool
 
@@ -15,21 +15,21 @@ from multiprocessing.pool import ThreadPool
 
 
 def f(fn):
-    datapath = '../../datasets/retouch/'
-    img = imread(datapath + 'input_1024/' + fn).astype(np.float)
-    out = imread(datapath + 'output_1024/' + fn).astype(np.float)
-    return img / 127.5 - 1, out / 127.5 - 1
+    datapath = '../../datasets/facades/base/base/'
+    rgb = imresize(imread(datapath + fn), (256, 256)).astype(np.float)
+    label = imresize(imread(datapath + fn.replace('.jpg','.png')), (256,256)).astype(np.float)
+    return rgb / 127.5 - 1, label / 127.5 - 1
 
 
 def datagen(batch_size=16):
     pool = ThreadPool(cpu_count())
-    datapath = '../../datasets/retouch/'
-    imgnames = [s for s in os.listdir(datapath + '/input_1024/') if s.endswith('.jpg')]
+    datapath = '../../datasets/facades/base/base/'
+    imgnames = [s for s in os.listdir(datapath) if s.endswith('.jpg')]
     n = len(imgnames)
     k = 0
     while True:
-        x = np.zeros((batch_size, 1024, 1024, 3))
-        y = np.zeros((batch_size, 1024, 1024, 3))
+        x = np.zeros((batch_size, 256, 256, 3))
+        y = np.zeros((batch_size, 256, 256, 3))
 
         batch = []
         for i in range(batch_size):
@@ -41,8 +41,8 @@ def datagen(batch_size=16):
         result = pool.map(f, batch)
 
         for i, r in enumerate(result):
-            x[i] = r[0]
-            y[i] = r[1]
+            x[i] = r[1]
+            y[i] = r[0]
             # img = imread(datapath + 'input_1024/' + imgnames[k]).astype(np.float)
             # dif = np.load(datapath + 'output-input_1024/' + imgnames[k]+'.npy').astype(np.float)
             # X[i] = img / 127.5 - 1
@@ -248,8 +248,8 @@ if __name__ == '__main__':
 
     params = MyDict({
         # Model
-        'nfd': 16,  # Number of filters of the first layer of the discriminator
-        'nfatob': 16,  # Number of filters of the first layer of the AtoB model
+        'nfd': 32,  # Number of filters of the first layer of the discriminator
+        'nfatob': 32,  # Number of filters of the first layer of the AtoB model
         'alpha': 100,  # The weight of the reconstruction loss of the atob model
         # Train
         'epochs': 1000,  # Number of epochs to train the model
@@ -271,11 +271,11 @@ if __name__ == '__main__':
         # Image
         'a_ch': 3,  # Number of channels of images A
         'b_ch': 3,  # Number of channels of images B
-        'is_a_binary': True,  # If A is binary, its values will be either 0 or 1
+        'is_a_binary': False,  # If A is binary, its values will be either 0 or 1
         'is_b_binary': False,  # If B is binary, the last layer of the atob model is followed by a sigmoid
-        'is_a_grayscale': True,  # If A is grayscale, the image will only have one channel
+        'is_a_grayscale': False,  # If A is grayscale, the image will only have one channel
         'is_b_grayscale': False,  # If B is grayscale, the image will only have one channel
-        'target_size': 1024,  # The size of the images loaded by the iterator. DOES NOT CHANGE THE MODELS
+        'target_size': 256,  # The size of the images loaded by the iterator. DOES NOT CHANGE THE MODELS
         'rotation_range': 0.,  # The range to rotate training images for dataset augmentation
         'height_shift_range': 0.,  # Percentage of height of the image to translate for dataset augmentation
         'width_shift_range': 0.,  # Percentage of width of the image to translate for dataset augmentation
@@ -322,9 +322,9 @@ if __name__ == '__main__':
 
     ts = params.target_size
     train_dir = os.path.join(params.base_dir, params.train_dir)
-    it_train = datagen()
+    it_train = datagen(batch_size=params.batch_size)
     val_dir = os.path.join(params.base_dir, params.val_dir)
-    it_val = datagen()
+    it_val = datagen(batch_size=params.batch_size)
 
     models = model_creation(d, unet, params)
     train(models, it_train, it_val, params)
