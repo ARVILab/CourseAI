@@ -124,7 +124,7 @@ sudo pip install keras_vggface
 2. Відновлювати зображення з скетчу 
 (див. [Holistic Edge Detection](https://github.com/s9xie/hed)).
 
-3. Задача ретуші для датасету `retouch`.
+3. Задача з двома зірочками: ретуш для датасету `retouch` методом GAN.
 
 ## 28.10
 
