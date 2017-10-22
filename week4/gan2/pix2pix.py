@@ -247,8 +247,8 @@ def pix2pix(atob, d, a_ch, b_ch, alpha=100, is_a_binary=False,
     Non-trainable params: 408.0
     _________________________________________________________________
     """
-    a = Input(shape=(1024, 1024, a_ch))
-    b = Input(shape=(1024, 1024, b_ch))
+    a = Input(shape=(256, 256, a_ch))
+    b = Input(shape=(256, 256, b_ch))
 
     # A -> B'
     bp = atob(a)
@@ -284,6 +284,6 @@ def pix2pix(atob, d, a_ch, b_ch, alpha=100, is_a_binary=False,
 
 if __name__ == '__main__':
     unet = g_unet(3, 3, 32, batch_size=8, is_binary=False)
-    disc = discriminator(3, 3, 16)
+    disc = discriminator(3, 3, 32)
     pp_net = pix2pix(unet, disc, 3, 3)
     print('ololo')
