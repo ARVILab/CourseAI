@@ -6,9 +6,14 @@ from keras.layers import Conv2D, Conv2DTranspose, UpSampling2D, Concatenate
 from keras.layers import LeakyReLU, Dropout
 from keras.layers import BatchNormalization
 from keras.optimizers import RMSprop
+import keras.backend as K
+import tensorflow as tf
 
 import matplotlib.pyplot as plt
 import cv2
+
+
+batch_size = 128
 
 
 # discriminator
@@ -97,10 +102,17 @@ def generator_model():
 
 
 discriminator = discriminator_model()
+def custom_D_loss_mse(y_true, y_pred):
+    shape = tf.shape(y_pred)
+    half_size = tf.cast(shape[0]/2, tf.int32)
+    realImages_true = y_true[:half_size,:]
+    realImages_pred = y_pred[:half_size,:]
+
+    mse = K.mean(K.square(realImages_true - realImages_pred))
+    return mse
 discriminator.compile(
-    loss=['binary_crossentropy', 'mse'],
-    optimizer=RMSprop(lr=0.0002, decay=6e-8),
-    metrics=['accuracy'])
+    loss=['binary_crossentropy', custom_D_loss_mse],
+    optimizer=RMSprop(lr=0.0002, decay=6e-8))
 
 generator = generator_model()
 
@@ -111,8 +123,7 @@ d = discriminator(g)
 adversarial = Model(inputs=[inp_z, inp_l], outputs=d)
 adversarial.compile(
     loss=['binary_crossentropy', 'mse'],
-    optimizer=RMSprop(lr=0.0001, decay=3e-8),
-    metrics=['accuracy'])
+    optimizer=RMSprop(lr=0.0001, decay=3e-8))
 
 
 inconNames = np.load('../../datasets/icons/X.npy')
@@ -152,8 +163,8 @@ def train(train_steps=200000, batch_size=256, save_interval=0):
         noise = np.random.uniform(-1.0, 1.0, size=[batch_size, 100])
         a_loss = adversarial.train_on_batch([noise, lbls_train], [y, lbls_train])
 
-        log_mesg = "%d: [D loss: %f, acc: %f]" % (i, d_loss[0], d_loss[1])
-        log_mesg = "%s  [A loss: %f, acc: %f]" % (log_mesg, a_loss[0], a_loss[1])
+        log_mesg = "%d: [D loss: %f, classLoss: %f]" % (i, d_loss[1], d_loss[2])
+        log_mesg = "%s  [A loss: %f, classLoss: %f]" % (log_mesg, a_loss[1], a_loss[2])
         print(log_mesg)
 
         if save_interval > 0:
@@ -190,6 +201,6 @@ def plot_images(save2file=False, fake=True, samples=16, noise=None, step=0):
 
 
 if __name__ == '__main__':
-    train(train_steps=200000, batch_size=128, save_interval=100)
+    train(train_steps=200000, batch_size=batch_size, save_interval=100)
     plot_images(fake=True)
     plot_images(fake=False, save2file=True)
