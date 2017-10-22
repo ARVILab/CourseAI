@@ -14,17 +14,18 @@ from multiprocessing.pool import ThreadPool
 # add to ~/.config/matplotlib/matplotlibrc line backend : Agg
 
 
-def f(fn):
-    datapath = '../../datasets/facades/base/base/'
-    rgb = imresize(imread(datapath + fn), (256, 256)).astype(np.float)
-    label = imresize(imread(datapath + fn.replace('.jpg','.png')), (256,256)).astype(np.float)
+def read_resize(fn):
+    rgb = imresize(imread(fn), (256, 256)).astype(np.float)
+    label = imresize(imread(fn.replace('.jpg', '.png')), (256, 256)).astype(np.float)
     return rgb / 127.5 - 1, label / 127.5 - 1
 
 
 def datagen(batch_size=16):
     pool = ThreadPool(cpu_count())
-    datapath = '../../datasets/facades/base/base/'
-    imgnames = [s for s in os.listdir(datapath) if s.endswith('.jpg')]
+    datapath = '../../datasets/facades/'
+    imgnames = [os.path.join(root, f)
+                 for root, _, files in os.walk(datapath)
+                 for f in files if f.endswith('.jpg')]
     n = len(imgnames)
     k = 0
     while True:
@@ -38,7 +39,7 @@ def datagen(batch_size=16):
             if not k:
                 random.shuffle(imgnames)
 
-        result = pool.map(f, batch)
+        result = pool.map(read_resize, batch)
 
         for i, r in enumerate(result):
             x[i] = r[1]
@@ -324,7 +325,7 @@ if __name__ == '__main__':
     train_dir = os.path.join(params.base_dir, params.train_dir)
     it_train = datagen(batch_size=params.batch_size)
     val_dir = os.path.join(params.base_dir, params.val_dir)
-    it_val = datagen(batch_size=params.batch_size//2)
+    it_val = datagen(batch_size=params.batch_size // 2)
 
     models = model_creation(d, unet, params)
     train(models, it_train, it_val, params)
