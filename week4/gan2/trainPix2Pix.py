@@ -324,7 +324,7 @@ if __name__ == '__main__':
     train_dir = os.path.join(params.base_dir, params.train_dir)
     it_train = datagen(batch_size=params.batch_size)
     val_dir = os.path.join(params.base_dir, params.val_dir)
-    it_val = datagen(batch_size=params.batch_size)
+    it_val = datagen(batch_size=params.batch_size//2)
 
     models = model_creation(d, unet, params)
     train(models, it_train, it_val, params)
