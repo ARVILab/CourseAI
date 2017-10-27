@@ -1,0 +1,145 @@
+body {
+	color: #444;
+	font-family: Tahoma,Geneva,sans-serif;
+	font-size: 13px;
+	padding: 0px;
+	margin: 0px;
+}
+h1{
+	text-align: center;
+}
+
+.hl{
+	color: red;
+}
+.top-line{
+	margin-top:0px;
+	color:black;
+	border-color:black;
+	border-bottom-width: 0px;
+}
+.container{
+	margin-top: 30px;
+}
+.inner-wrap{
+	width: 960px;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+	.tabs ul{
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	.tabs li{
+		float: left;
+		border: 1px solid #bbb;
+		border-bottom-width: 0;
+		margin: 0;
+	}
+
+	.tabs li a{
+		text-decoration: none;
+		display: block;
+		background: #eee;
+		padding: 0.24em 1em;
+		color: #00c;
+		width: 8em;
+		text-align: center;
+	}
+
+	.tabs .selected{
+		border-color: black;
+	}	
+
+	.tabs .selected a{
+		position: relative;
+		top: 1px;
+		background: white;
+		color: black;
+		font-weight: bold;
+	}
+
+
+.header{
+	text-align: center;
+}
+	.header h2{
+		color : #aaa;
+	}
+
+	.demo{
+		padding-bottom: 10px;
+		padding-top: 34px;
+		background-color: #f5f5f5;
+		border-top: 1px solid #e3e3e3;
+		border-bottom: 1px solid #e3e3e3;
+		-webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.05);
+		-moz-box-shadow: inset 0 1px 1px rgba(0,0,0,0.05);
+		box-shadow: inset 0 1px 1px rgba(0,0,0,0.05);
+	}
+
+.apiDocTable{
+	width: 100%;
+	border: 1px solid black;
+	border-collapse: collapse;
+}	
+
+.timeline-content{
+	text-align: center;
+}
+.timeline-content h3{
+	/*text-align: center;*/
+}
+.timeline-content img{
+	height: 200px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.clear:before,
+.clear:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+}
+
+.clear:after {
+    clear: both;
+}
+
+.clear {
+    *zoom: 1;
+}
+
+
+.button{
+		background: url(../img/buttons.png) no-repeat 0 0;
+		width: 255px;
+		height: 42px;
+		cursor: pointer;
+		display: block;
+}
+
+.button-direct-download{
+	background-position: 0px 0px;
+}
+.button-direct-download:hover{
+	background-position: 0px -45px;
+}
+.button-github{
+	background-position: 0px -90px;
+}
+.button-github:hover{
+	background-position: 0px -135px;
+}
+
+
+.footer{
+	background-color: #cccccc;
+	min-height: 50px;
+	margin-top: 20px;
+	padding-top: 20px;
+	border-top: 2px solid #999999;
+}
