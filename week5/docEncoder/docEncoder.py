@@ -1,11 +1,11 @@
 from keras.models import Model
-from keras.layers import Input, Dense, LSTM, GRU, Conv1D, Concatenate, MaxPool1D, Embedding, Bidirectional
+from keras.layers import Input, Dense, LSTM, Conv1D, MaxPool1D, Embedding, Bidirectional
 import numpy as np
-from keras.regularizers import l2
 import keras.backend as K
 import tensorflow as tf
 
-def getModel(inputlength = 512, w2vPath = 'wordEmbeddings.npy', batch_size=32):
+
+def getModel(inputlength=512, w2vPath='wordEmbeddings.npy', batch_size=32):
     inp = Input((inputlength,))
 
     weights = np.load(w2vPath)
@@ -18,20 +18,18 @@ def getModel(inputlength = 512, w2vPath = 'wordEmbeddings.npy', batch_size=32):
     lstm = Bidirectional(LSTM(256, return_sequences=False), merge_mode='concat')(m2)
     docvec = Dense(512, activation='tanh')(lstm)
 
-
     def SiamenseLoss(y_true, y_pred):
 
-        firstParts = K.l2_normalize(y_pred[::2,:], axis=-1)
-        secondParts = K.l2_normalize(y_pred[1::2,:],axis=-1)
+        firstParts = K.l2_normalize(y_pred[::2, :], axis=-1)
+        secondParts = K.l2_normalize(y_pred[1::2, :], axis=-1)
 
         firstmat = K.expand_dims(firstParts, 1)
         secondmat = K.expand_dims(secondParts, 0)
 
-        firstmat = K.tile(firstmat, (1, batch_size,1))
-        secondmat = K.tile(secondmat, (batch_size,1, 1))
+        firstmat = K.tile(firstmat, (1, batch_size, 1))
+        secondmat = K.tile(secondmat, (batch_size, 1, 1))
         cosSim = K.sum((firstmat * secondmat), axis=-1)
         distMatrix = 1 - cosSim
-
 
         sameDists = K.mean(tf.diag_part(distMatrix))
 
