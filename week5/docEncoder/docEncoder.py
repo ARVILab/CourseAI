@@ -5,7 +5,7 @@ from keras.regularizers import l2
 import keras.backend as K
 import tensorflow as tf
 
-def getModel(inputlength = 512, w2vPath = 'data/wordEmbeddings.npy', batch_size=32):
+def getModel(inputlength = 512, w2vPath = 'wordEmbeddings.npy', batch_size=32):
     inp = Input((inputlength,))
 
     weights = np.load(w2vPath)
