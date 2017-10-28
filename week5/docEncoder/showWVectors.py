@@ -1,18 +1,13 @@
-import numpy as np
-import pickle
 import gensim.models
-model = gensim.models.Word2Vec.load('/DATA/CourseAI/datasets/nlp/emb/wordEmbeddings')
-
-words = model.wv.index2word[:10000]
-AllVecs = model.wv.syn0[:10000]
-
-
-
 import os
 import tensorflow as tf
 from tensorflow.contrib.tensorboard.plugins import projector
-
 import codecs
+
+model = gensim.models.Word2Vec.load('../../datasets/nlp/emb/wordEmbeddings')
+
+words = model.wv.index2word[:10000]
+AllVecs = model.wv.syn0[:10000]
 
 
 # setup a TensorFlow session
@@ -25,11 +20,11 @@ sess.run(tf.global_variables_initializer())
 sess.run(set_x, feed_dict={place: AllVecs})
 
 # write labels
-k=0
+k = 0
 with codecs.open('log/metadata.tsv', 'w', 'utf-8') as f:
     for sent in words:
-        f.write(sent.replace('\n','') + '\n')
-        k+=1
+        f.write(sent.replace('\n', '') + '\n')
+        k += 1
 
 # create a TensorFlow summary writer
 summary_writer = tf.summary.FileWriter('log', sess.graph)
@@ -42,6 +37,3 @@ projector.visualize_embeddings(summary_writer, config)
 # save the model
 saver = tf.train.Saver()
 saver.save(sess, os.path.join('log', "model.ckpt"))
-
-
-

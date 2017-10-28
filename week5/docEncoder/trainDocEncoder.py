@@ -1,8 +1,6 @@
-import numpy as np
 from siamenseGenerator import generator
 from docEncoder import getModel
 from keras.callbacks import ModelCheckpoint
-import pickle
 
 batch_size = 128
 datapath = 'data/'
