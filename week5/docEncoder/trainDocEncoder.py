@@ -1,5 +1,5 @@
 import numpy as np
-from NE_vec_generator import generator
+from siamenseGenerator import generator
 from docEncoder import getModel
 from keras.callbacks import ModelCheckpoint
 import pickle
