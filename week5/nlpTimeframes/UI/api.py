@@ -14,13 +14,12 @@ import logging
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
 models = {
-        'subtitlesEn': {'3d':[],'w2v':[],'startYear':1950,'words':[]},
-        'focusRu':{'3d':[],'w2v':[],'startYear':2007,'words':[]}
+        'subtitlesEn': {'3d':[],'w2v':[],'startYear':1950,'words':[]}
         }
 
-for i in xrange(1950, 2016, 10):
-    if os.path.isfile('../yearModels/subtitlesEn/w2v/'+str(i)):
-        m = gensim.models.Word2Vec().load('../yearModels/subtitlesEn/w2v/'+str(i))
+for i in xrange(1950, 2005, 5):
+    if os.path.isfile('models/'+str(i)):
+        m = gensim.models.Word2Vec().load('models/'+str(i))
         m.syn0 = m.syn0[:8000]
         m.syn1neg = m.syn1neg[:8000]
         models['subtitlesEn']['w2v'].append(m)
@@ -29,29 +28,14 @@ for i in xrange(1950, 2016, 10):
         models['subtitlesEn']['w2v'].append(models['subtitlesEn']['w2v'][-1])
 
 models['subtitlesEn']['words'] = models['subtitlesEn']['w2v'][0].index2word[:7500]
-models['subtitlesEn']['3d'] = json.load(open('../yearModels/subtitlesEn/subtitlesEn.json','r'))['years']
+models['subtitlesEn']['3d'] = json.load(open('models/subtitlesEn.json','r'))['years']
 
-for i in range(2007, 2017):
-    if os.path.isfile('../yearModels/focusRu/w2v/focus_'+str(i)):
-        m = gensim.models.Word2Vec().load('../yearModels/focusRu/w2v/focus_'+str(i))
-        m.syn0 = m.syn0[:8000]
-        m.syn1neg = m.syn1neg[:8000]
-        models['focusRu']['w2v'].append(m)
-    else :
-        models['focusRu']['w2v'].append(models['focusRu']['w2v'][-1])
-
-models['focusRu']['words'] = models['focusRu']['w2v'][0].index2word[:7500]
-models['focusRu']['3d'] = json.load(open('../yearModels/focusRu/focusRu.json','r'))['years']
 
 root = os.path.dirname(__file__)
 
 cache = {}
-if os.path.isfile('../yearModels/focusRu/cache.npy'):
-    cache['focusRu'] = np.load('../yearModels/focusRu/cache.npy')
-else :
-    cache['focusRu'] = {}
-if os.path.isfile('../yearModels/subtitlesEn/cache.npy'):
-    cache['subtitlesEn'] = np.load('../yearModels/subtitlesEn/cache.npy')
+if os.path.isfile('models/cache.npy'):
+    cache['subtitlesEn'] = np.load('models/cache.npy')
 else:
     cache['subtitlesEn'] = {}
 
