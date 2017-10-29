@@ -6,6 +6,6 @@ for i in range(1948, 2012):
         for j in range(i, i+5):
             fn = '../../datasets/nlp/subs/en/%s.txt' % j
             if os.path.isfile(fn):
-                with open(fn,'r') as f:
+                with open(fn) as f:
                     of.write(f.read())
         print(i)
