@@ -10,7 +10,7 @@ model = gensim.models.Word2Vec(min_count=15,size=200)
 model.build_vocab(sentences)
 
 
-for year in range(1950,2014):
+for year in range(1950,2005):
 	print('training model for year: ' + str(year))
 	print('loading sentences...')
 	sentences = gensim.models.word2vec.LineSentence('../../datasets/nlp/subs/concat/%s.txt' % year)

@@ -1,7 +1,7 @@
 import os
 
 with open('../../datasets/nlp/subs/concat/all.txt', 'w') as allfile:
-    for i in range(1948, 2012):
+    for i in range(1948, 2002):
         s = ''
         with open('../../datasets/nlp/subs/concat/%s.txt' % (i+2), 'w') as of:
             for j in range(i, i+5):
