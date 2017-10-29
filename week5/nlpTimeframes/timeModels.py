@@ -10,14 +10,11 @@ sentences = gensim.models.word2vec.LineSentence("data/all.txt")
 model = gensim.models.Word2Vec(min_count=15,size=200)
 model.build_vocab(sentences)
 
-sentences = gensim.models.word2vec.LineSentence("data/years/2007.txt")
-model.train(sentences)
-model.save('models/focus_2007')
 
-for year in range(2008,2017):
+for year in range(1950,2014):
 	print('training model for year: ' + str(year))
 	print('loading sentences...')
-	sentences = gensim.models.word2vec.LineSentence("data/years/"+str(year)+".txt")
+	sentences = gensim.models.word2vec.LineSentence('../../datasets/nlp/subs/concat/%s.txt' % year)
 	print('training...')
 	model.train(sentences)
-	model.save('models/focus_'+str(year))
+	model.save('models/'+str(year))
