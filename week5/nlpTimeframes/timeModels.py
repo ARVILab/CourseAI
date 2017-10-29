@@ -28,4 +28,4 @@ for year in range(1950, 2005):
     tempModel.build_vocab(sentences)
 
     model.train(sentences, total_examples=tempModel.corpus_count, epochs=tempModel.iter)
-    model.save('UI/models/'+str(year))
+    model.save('UI/models/' + str(year))
