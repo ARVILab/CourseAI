@@ -4,7 +4,7 @@ import os
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
 print('loading sentences...')
-sentences = gensim.models.word2vec.LineSentence("../../datasets/nlp/subs/concat/all.txt")
+sentences = gensim.models.word2vec.LineSentence("../../datasets/nlp/subs/en/all.txt")
 
 model = gensim.models.Word2Vec(min_count=15,size=200)
 model.build_vocab(sentences)
