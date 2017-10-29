@@ -3,22 +3,18 @@ import logging
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
-print('training model for year: 2007')
 print('loading sentences...')
-sentences = gensim.models.word2vec.LineSentence("data/all.txt")
+sentences = gensim.models.word2vec.LineSentence("../../datasets/nlp/subs/concat/all.txt")
 
-model = gensim.models.Word2Vec(min_count=15,size=200)
+model = gensim.models.Word2Vec(min_count=15, size=200)
 model.build_vocab(sentences)
 
-sentences = gensim.models.word2vec.LineSentence("data/years/2007.txt")
-model.train(sentences)
-model.save('models/focus_2007')
-
-for year in range(1950, 2014):
+for year in range(1950, 2015):
     print('training model for year: ' + str(year))
     print('loading sentences...')
-    sentences = gensim.models.word2vec.LineSentence("data/years/"+str(year)+".txt")
+    sentences = gensim.models.word2vec.LineSentence('../../datasets/nlp/subs/concat/%s.txt' % year)
     print('training...')
-    model.train(sentences)
-    model.save('models/focus_' + str(year))
-
+    tempModel  = gensim.models.Word2Vec(min_count=15,size=1)
+    tempModel.build_vocab(sentences)
+    model.train(sentences, total_examples=tempModel.corpus_count, epochs=tempModel.iter)
+    model.save('UI/models/' + str(year))
