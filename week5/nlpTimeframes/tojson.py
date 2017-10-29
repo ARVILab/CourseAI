@@ -19,10 +19,7 @@ jsonObject = {
     'name': name,
     'startYear': startYear,
     'lastYear': lastYear,
-    'years': []
+    'years': years
 }
-
-for y in years:
-    jsonObject["years"].append(y)
 
 json.dump(jsonObject, open('UI/models/' + name + '.json', 'w'))
